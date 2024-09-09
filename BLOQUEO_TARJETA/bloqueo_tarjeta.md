@@ -119,7 +119,7 @@
     </RESPUESTA_BLOQUEOTARJETA>
     ```
 
-21. Si la dynamic property `P_ADMITEREEXPEDICION` es igual a `1` continua al paso 22. caso contrario, continua al paso 24.
+21. Si la dynamic property `P_ADMITEREEXPEDICION` es igual a `1` continua al paso 22.
 
 22. Aplica la transformación `Transformacion_Perfil_Reexpide_Tarjeta`
 
@@ -192,14 +192,54 @@
 
 3. Si la condición se cumple, flujo A, si no flujo B
 
-    3.A.1. Si la propiedad `P_ADMITEREEXPEDICION` es igual a `1` continuar al paso 3.A.2 si no ...
+#### Try catch regla de integración flujo A
 
-    3.A.2. Aplica la transformación `Transformacion_Perfil_Reexpide_Tarjeta`
+1. Si la propiedad `P_ADMITEREEXPEDICION` es igual a `1` continuar al paso 3.A.2 si no, ir al proceso de registro de log [Registro de logs](#logs)
 
-    3.A.3. Inicia proceso inicia proceso de reexpedición.
+2. Aplica la transformación `Transformacion_Perfil_Reexpide_Tarjeta`
 
-    3.B.1. Establece la propiedad 
+3. Establece la propiedad:
+- `P_IDSOLICITUDBLOQUEO`: `IDSOLICITUDBLOQUEO (REQUEST_REEXPIDE_TARJETA/IDSOLICITUDBLOQUEO)`
+
+El perfil en este punto es `Perfil_Request_Reexpide_Tarjeta`
+
+4. Inicia proceso inicia proceso de reexpedición
+
+5. En caso de que la respuesta sea exitosa se transforma el perfil actual con el siguiente message shape.
+
+    ```xml
+        <PARAMETROS_SP_GENERICO>
+            <PARAMETRO2>{1}</PARAMETRO2>
+            <PARAMETRO3></PARAMETRO3>
+            <PARAMETRO4>6</PARAMETRO4>
+            <PARAMETRO5>888</PARAMETRO5>
+        </PARAMETROS_SP_GENERICO>
+    ```
+    Donde:
+    - {1}: `P_IDSOLICITUDREEXPEDICION (RESPUESTA_INSERTA_SOLICITUD_REEXPEDICION/P_IDSOLICITUDREEXPEDICION)`
+    El perfil en este punto es: `XML Profile - Perfil_Response_Inserta_Solicitud_Tarjeta_Reexpedicion`
+
+6. Inicia el proceso `Actualiza_Solicitud_Reexpedición`
+
+7. Si el proceso falla se notifica mediante un notify shape.
+
+8. Ir al proceso de registro de log [Registro de logs](#logs)
+
+#### Try catch regla de integración flujo B
+
+1. Establece las siguientes propiedades.
+- `MENSAJE_ERROR`: `{MENSAJE_ERROR} + "-" + {Try catch message}`
+- `P_ESTADO`: `5`
+- `P_CODIGORESPUESTA`: `500`
+
+2. Inicia proceso `Actualiza_Solicitud_Bloqueo`
+
+3. Ir al proceso de registro de log [Registro de logs](#logs)
 
 ### Registro de logs {#logs}
 
-En construcción...
+1. Se aplica la siguiente transformación `Transformacion_Registro_Log_Bloqueo_Tarjeta`
+
+2. Existe una Cross Reference Table llamada `TB_INSERTA_LOG` donde el valor del parametro `VALIDA_INSERTA` determina si se inserta el log en la tabla. (Siendo `1` el valor para `true`)
+
+3. Se aplica la operación `Operacion_Registro_Log` en la conexión `Conexion_DB_CONDOR`
