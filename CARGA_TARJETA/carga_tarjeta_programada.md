@@ -41,6 +41,8 @@ Si quedan cuentas (tarjetas) pendientes, se deben manejar como `traslados` (nove
 ### Actividades del proceso: 
 Subproceso: `ri_Cargas_Programadas_NovoPayment_Condor`
 
+![alt text](assets/ri_Cargas_Programadas_NovoPayment_Condor.png)
+
 1. Consulta Productos en `Condor DB` -> Conector: `Operacion_Obtener_Productos_NovoPayment` -> Mapeo `Transformacion_Productos_Novopayment` -> Resultado `Producto_cargado`
 
 <!-- EJEMPLO.... -->

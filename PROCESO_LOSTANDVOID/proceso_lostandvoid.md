@@ -44,7 +44,9 @@ Subproceso principal: `ri_Proceso_LostAndVoid`
     Se utiliza la cola de boomi `Cola_Proceso_LostAndVoid` con la operacion de enviar / encolar mensajes  `Operacion_Evia_Cola_Proceso_LostAndVoid`.
     Tamaño de batch de envio: 5
 
-2. Se corre el proceso queue_ProcesoLostAndVoid que escucha nuevos mensajes en la cola `Cola_Proceso_LostAndVoid` con la operacion `Operacion_Escucha_Cola_Proceso_LostAndVoid` y llama el subproceso `ri_Proceso_LostAndVoid`
+2. Se corre el proceso queue_ProcesoLostAndVoid que escucha nuevos mensajes en la cola `Cola_Proceso_LostAndVoid` con la operacion `Operacion_Escucha_Cola_Proceso_LostAndVoid` y llama el subproceso principal `ri_Proceso_LostAndVoid`
+
+![alt text](assets/ri_Proceso_LostAndVoid.png)
 
 3. Establecer variable OPERACION
 
