@@ -6,17 +6,27 @@ Frecuencia de ejecucion: mensual
 
 ### Sistemas involucrados: 
 
- - Novopayment 
- - Condor Application Server (Web service): [APPSERVER_IP]:[PORT]/ws/simple/executeConfirmarPedidoCarga
-- Condor DB Oracle
+ - Novopayment API: https://tomcat-uat-sodexo.novopayment.net/sodexoapi/1.0/{2}/employee/{1}{4}{3}
+	
+    `{1}` Value_employee
+	
+    `{2}` value_programId
+	
+    `{3}` value_trxid
+	
+    `{4}` value_path_operation
+- Condor BD Oracle
 - Boomi: Cola_Proceso_LostAndVoid
 
 ### Descripcion general:
-Despues de enviar la carga programada de tarjetas al autorizador Novopayment, este ultimo procesa
+Proceso de bloqueo masivo de cuentas (tarjetas) en Novopayment a partir del insumo de datos de Condor BD. El job proceso lost and void escribe mensajes en la cola boomi `Cola_Proceso_LostAndVoid` y otro proceso escucha los nuevos mensajes que llegan a dicha cola (Publish - Subscribe) y hace un llamado al subproceso principal `ri_Proceso_LostAndVoid` que se encarga de obtener los datos detallados de Condor DB a traves de un SP `SP_GET_DATA_LOSTANDVOID` dados los id productos obtenidos como parametros. 
+Luego de esto, se preparan los datos y se hacen las transformaciones respectivas para enviar a Novopayment por medio de un llamado a su API. 
+Dependiendo de la respuesta de Novo, se actualiza en Condor el resultado del proceso a traves de llamados a varios SP. 
 
 
 ### Variables globales:
 - OPERACION
+- DPP_ESTADO
 - DPP_OK_ESTADO_INICIAL
 
 
@@ -59,6 +69,7 @@ Subproceso principal: `ri_Proceso_LostAndVoid`
         ID_EJECUCION = ID_EJECUCION.substring(10,ID_EJECUCION.length()-11); 
 
     Guardar cache
+
     Ejecutar en Condor BD `Operacion_SP_GET_DATA_LOSTANDVOID`,
     Mapeo a XML `Transformacion_Perfil_SP_GET_DATA_LOSTANDVOID_to_Perfil_SP_GET_DATA_LOSTANDVOID_XML`: `Perfil_SP_GET_DATA_LOSTANDVOID`
 
@@ -144,7 +155,73 @@ Subproceso principal: `ri_Proceso_LostAndVoid`
     
     Mapeo `Transformacion_Perfil_Request_Proceso_LostAndVoid_Novopayment_to_Perfil_Request_Proceso_LostAndVoid_Novopayment_IDENTITY_Oracle_19`: `Perfil_Request_Proceso_LostAndVoid_Novopayment` que incluye las funciones `funcion_llave_documento` y `Funcion_Crea_TRXID_Masivo_Connection_Oracle_19`
 
-    Borrar y guardar nuevamente cache Cache_Perfil_Request_Proceso_LostAndVoid_Novopayment
+    Borrar y guardar nuevamente cache `Cache_Perfil_Request_Proceso_LostAndVoid_Novopayment`
 
-    Voy en ms_Proceso_LostAndVoid_Novopayment....
+    Mapeo `Transformacion_Perfil_Request_Proceso_LostAndVoid_Novopayment_to_Perfil_Request_Proceso_LostAndVoid_Novopayment_JSON`: `Perfil_Request_Proceso_LostAndVoid_Novopayment`
+
+    Establecer variable `OPERACION`
+
+    Llamar al subproceso `ConnectorHttpClientNovopayment` que se encarga de autenticarse o validar token existente y luego ejecutar el llamado respectivo a Novopayment API. 
+
+    Si en la respuesta de Novo `rc` no es vacio (sin error)
+
+        Mapeo a XML  `Transformacion_Perfil_Response_Proceso_LostAndVoid_Novopayment_to_Perfil_Response_Proceso_LostAndVoid_Novopayment_XML`: `Perfil_Response_Proceso_LostAndVoid_Novopayment`  
+        Mapeo `Transformacion_Perfil_Response_Proceso_LostAndVoid_Novopayment_to_Perfil_Response_Proceso_LostAndVoid_Novopayment_IDENTITY`: `Perfil_Response_Proceso_LostAndVoid_Novopayment`
+
+        Si rc = 0 (sin error):
+        Guardar cache Cache_Perfil_Response_Proceso_LostAndVoid_Novopayment
+
+        Si rc <> 0, construir XML:
+        <Perfil_Response_Proceso_LostAndVoid_Novopayment>
+        <rc>{1}</rc>
+        <msg>{2}</msg>
+        <trxId>{3}</trxId>
+        <IDENTITY>{4}</IDENTITY>
+        <transactionDate></transactionDate>
+        <IDNOVEDADMONETARIA_PRODUCTO>{5}</IDNOVEDADMONETARIA_PRODUCTO>
+        </Perfil_Response_Proceso_LostAndVoid_Novopayment>
+
+    De lo contrario (error generico), mapeo `Transformacion_Perfil_Error_Generico_Novopayment_to_Perfil_Response_Proceso_LostAndVoid_Novopayment`: `Perfil_Response_Proceso_LostAndVoid_Novopayment`  
+    Construir XML: 
+    ```xml
+    <Perfil_Response_Proceso_LostAndVoid_Novopayment>
+    <rc>{1}</rc>
+    <msg>{2}</msg>
+    <trxId>{3}</trxId>
+    <IDENTITY>{4}</IDENTITY>
+    <transactionDate></transactionDate>
+    <IDNOVEDADMONETARIA_PRODUCTO>{5}</IDNOVEDADMONETARIA_PRODUCTO>
+    </Perfil_Response_Proceso_LostAndVoid_Novopayment>
+    ```
+
+    Si la respuesta de Novo no devuelve codigo 200, Mapeo `Transformacion_Perfil_Sin_Datos_to_Perfil_Response_Proceso_LostAndVoid_Novopayment`: `Perfil_Response_Proceso_LostAndVoid_Novopayment`
+    
+    Construir XML:
+    ```xml
+    {1} Http error code
+    {2} Http error message
+    {3} TRX_ID
+    {4} {5} IDENTITY
+    <Perfil_Response_Proceso_LostAndVoid_Novopayment>
+        <rc>999</rc>
+        <msg>{1} - {2}</msg>
+        <trxId>{3}</trxId>
+        <IDENTITY>{4}</IDENTITY>
+        <transactionDate></transactionDate>
+        <IDNOVEDADMONETARIA_PRODUCTO>{5}</IDNOVEDADMONETARIA_PRODUCTO>
+    </Perfil_Response_Proceso_LostAndVoid_Novopayment>
+    
+    ```
+    Guardar cache Cache_Perfil_Response_Proceso_LostAndVoid_Novopayment y vuelve al proceso principal.
+
+    Mapeo Transformacion_Perfil_Response_Proceso_LostAndVoid_Novopayment_to_Perfil_Datos_Intento: Perfil_Datos_Intento
+
+    Se procesan reintentos en caso de rc=999, llamando al subproceso `ms_procesa_reintentos` y al subproceso `ms_Proceso_LostAndVoid_Novopayment`.
+
+    Luego de realizado el proceso en novo, mapeo `Transformacion_Perfil_Response_Proceso_LostAndVoid_Novopayment_to_Perfil_SP_PARAMETROS_ACTUALIZA_NOVEDAD_MONETARIA_DETALLE`: `Perfil_SP_PARAMETROS_ACTUALIZA_NOVEDAD_MONETARIA_DETALLE` con actualizacion DPP_ESTADO y llamado al subproceso Condor BD: `ms_Actualiza_Estado_Novedad_Monetaria_Detalle`
+
+
+
+
+
 
