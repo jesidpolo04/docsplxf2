@@ -7,7 +7,7 @@ Frecuencia de ejecucion: a demanda
 ### Sistemas involucrados: 
 
  - Novopayment 
- - Condor Application Server (Web service): [APPSERVER_IP]:[PORT]/ws/simple/executeConfirmarPedidoCarga
+ - Boomi Application Server (Web service): [APPSERVER_IP]:[PORT]/ws/simple/executeConfirmarPedidoCarga
 - Condor DB Oracle
 
 
