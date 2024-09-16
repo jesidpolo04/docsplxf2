@@ -23,6 +23,8 @@ Proceso de bloqueo masivo de cuentas (tarjetas) en Novopayment a partir del insu
 Luego de esto, se preparan los datos y se hacen las transformaciones respectivas para enviar a Novopayment por medio de un llamado a su API. 
 Dependiendo de la respuesta de Novo, se actualiza en Condor el resultado del proceso a traves de llamados a varios SP. 
 
+![Diagrama general](<assets/Pluxee_flowDiagrams_v3-AS-IS LostAndVoid.jpg>)
+
 
 ### Variables globales:
 - OPERACION
@@ -32,6 +34,7 @@ Dependiendo de la respuesta de Novo, se actualiza en Condor el resultado del pro
 
 ### Actividades del proceso: 
 Subproceso principal: `ri_Proceso_LostAndVoid`
+
 
 1. Se construye el mensaje 
     ```xml

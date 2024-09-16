@@ -36,6 +36,8 @@ En caso de errores en el proceso se ejecuta en Condor `PKG_WSSERVICIO.SP_INSERTA
 ### Actividades del proceso: 
 Subproceso principal: `ri_Confirmacion_LostAndVoid`
 
+![Proceso](assets/ri_Confirmacion_LostAndVoid.png)
+
 1. Novo invoca el web service `executeConfirmacionLostandVoid` con el siguiente perfil de entrada (request):
 
 ![alt text](assets/image.png)
@@ -79,10 +81,13 @@ Si hay falla en el proceso, envia correo de notificacion y escribe logs.
 
 ### ms_SP_CONFIRMACION_LOSTANDVOID
 Este subproceso se encarga de guardar la confirmacion de LostAndVoid enviada por Novo en Condor BD.
+
 Mapeo Transformacion_Perfil_Generico_To_Perfil_Generico:
 Perfil_Parametros_Entrada_Generico_Salida con funcion Funcion_Llave_Documento para generar IDRECORD.
 Quitar y guardar cache Perfil_Parametros_Entrada_Generico_Salida
+
 Mapeo Transformacion_Perfil_Parametros_Entrada_Generico_Salida_to_Perfil_PKG_LOSTANDVOID.SP_CONFIRMACION_LOSTANDVOID_Request: Perfil_PKG_LOSTANDVOID.SP_CONFIRMACION_LOSTANDVOID_Request.
+
 Correr en Condor BD `PKG_LOSTANDVOID.SP_CONFIRMACION_LOSTANDVOID` (SP).
 Enviar respuesta del SP al proceso principal a partir de transformacion del Perfil_PKG_LOSTANDVOID.SP_CONFIRMACION_LOSTANDVOID_Response. 
 
