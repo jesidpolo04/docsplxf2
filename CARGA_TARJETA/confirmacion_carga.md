@@ -35,6 +35,8 @@ En caso de errores en el proceso se ejecuta en Condor `PKG_WSSERVICIO.SP_INSERTA
 ### Actividades del proceso: 
 Subproceso principal: `ri_Confirmacion_Pedido_Carga`
 
+![Proceso](assets/ri_Confirmacion_Pedido_Carga.png)
+
 1. Se invoca el web service `executeConfirmarPedidoCarga` a traves de la operacion `Operacion_ConfirmarPedidoCarga` (Objeto ConfirmarPedidoCarga). 
 
     Perfil request: JSON, `Perfil_Request_Confirmacion_Pedido_Carga` que incluye un objeto principal con el codProducto y fechaTransaccion. Dentro de este se incluye un array ListaPedido que incluye: idPedido, trxId, creditType, totalCargaRecibidas, totalCargaExitosas, totalCargaNoExitosas y listaCargaNoExitosas (objeto array)

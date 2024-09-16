@@ -33,6 +33,8 @@ Los pedidos no se pueden modificar. Siempre se manda a Novo el `idCuenta` origin
 
 Si quedan cuentas (tarjetas) pendientes, se deben manejar como `traslados` (novedad monetaria)
 
+![Diagrama general](<assets/Pluxee_flowDiagrams_v3-AS-IS Scheduled Deposit.jpg>)
+
 ### Variables globales:
 - TIPO_TRANSACCION
 - DPP_NOMBRE_PROCESO
