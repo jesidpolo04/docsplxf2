@@ -15,6 +15,8 @@ Proceso tipo job sincronico de creacion de clientes por lotes en Business Centra
 Luego de esto, se preparan los datos y se hacen las transformaciones respectivas para enviar a Business Central por medio de un llamado a su API. 
 Dependiendo de la respuesta de BC, se actualiza en Condor el resultado del proceso a traves de llamado a SP SP_UPDATE_MIGRARCLIENTE_BC. 
 
+![Diagrama general](<assets/Pluxee_flowDiagrams_v3-AS-IS Condor-BC Customer integration.jpg>)
+
 
 ### Actividades del proceso: 
 Subproceso principal: `ri_Crea_Cliente_Condor_BC`
