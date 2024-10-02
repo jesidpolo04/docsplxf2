@@ -7,7 +7,7 @@ Frecuencia de ejecucion: Programado
 ### Sistemas involucrados: 
 
 - Condor BD Oracle
-
+- SMTP
 
 ### Descripcion general:
 Proceso Job sincronico ejecutado para lanzar una alerta para tarjetas emitidas pero que no ha sido activada y tiene movimientos.   

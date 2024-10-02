@@ -7,7 +7,7 @@ Frecuencia de ejecucion: Programado
 ### Sistemas involucrados: 
 
 - Condor BD Oracle
-
+- SMTP
 
 ## Descripcion general:
 Procesos Job sincronicos que generan las siguientes alertas:

@@ -7,7 +7,7 @@ Frecuencia de ejecucion: Programado
 ### Sistemas involucrados: 
 
 - Condor BD Oracle
-
+- SMTP
 
 ### Descripcion general:
 Proceso Job sincronico ejecutado ejecutar una alerta se refiere que se han intentado realizar operaciones con una tarjeta que ha sido bloqueada

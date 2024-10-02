@@ -7,6 +7,7 @@ Frecuencia de ejecucion: Programado
 ### Sistemas involucrados: 
 
 - Condor BD Oracle
+- SMTP
 
 
 ### Descripcion general:
