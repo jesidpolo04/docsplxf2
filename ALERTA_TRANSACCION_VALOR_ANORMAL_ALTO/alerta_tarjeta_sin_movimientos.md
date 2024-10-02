@@ -10,7 +10,7 @@ Frecuencia de ejecucion: Programado
 - SMTP
 
 ### Descripcion general:
-Proceso Job sincronico ejecutado ejecutar una alerta por lo general indica que se ha detectado una transacción en tu cuenta que supera el monto habitual de tus operaciones.
+Proceso Job sincronico ejecutando una alerta por lo general indica que se ha detectado una transacción en la cuenta que supera el monto habitual de sus operaciones.
 
 
 
