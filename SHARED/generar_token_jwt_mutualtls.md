@@ -2,9 +2,27 @@
 
 ## Prerequisites
 
-Azure AD Application: Ensure you have registered an application in Azure AD and have the Client ID, Client Secret, and Tenant ID.
+- Azure AD Application: Ensure you have registered an application in Azure AD and have the Client ID, Client Secret, and Tenant ID.
 
-Certificates: You need client and server certificates for mTLS.
+- Certificates: You need client and server certificates for mTLS.
+
+- Configure JWT Validation in APIM:
+Add the `validate-jwt` policy to your API in APIM to ensure that incoming requests contain a valid JWT token. Here’s an example configuration:
+
+```XML
+<inbound>
+  <base />
+  <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized">
+    <openid-config url="https://login.microsoftonline.com/{tenant}/v2.0/.well-known/openid-configuration" />
+    <audiences>
+      <audience>api://{your-api-client-id}</audience>
+    </audiences>
+    <issuers>
+      <issuer>https://sts.windows.net/{tenant-id}/</issuer>
+    </issuers>
+  </validate-jwt>
+</inbound>
+```
 
 ## Steps to Request a JWT Token with mTLS
 
@@ -53,4 +71,5 @@ If the request is successful, you will receive a JSON response containing the ac
 You can then use this access token to authenticate API requests by including it in the Authorization header:
 
     curl -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>" https://yourapi.com/v1.0/resource
+
 
