@@ -1,10 +1,12 @@
-Prerequisites
+# APIM with entraID - JWT 
+
+## Prerequisites
 
 Azure AD Application: Ensure you have registered an application in Azure AD and have the Client ID, Client Secret, and Tenant ID.
 
 Certificates: You need client and server certificates for mTLS.
 
-Steps to Request a JWT Token with mTLS
+## Steps to Request a JWT Token with mTLS
 
 - Register an Application in Azure AD:
 
@@ -39,7 +41,7 @@ Token request URL example: https://login.microsoftonline.com/<YOUR_TENANT_ID>/oa
 Example Response:
 If the request is successful, you will receive a JSON response containing the access token:
 
-```JSON
+```json
 
 {
   "token_type": "Bearer",
